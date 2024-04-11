@@ -1,4 +1,5 @@
 from functools import reduce
+from itertools import cycle
 from typing import Tuple, List, Dict
 from collections import Counter
 def prime_factors(n):
@@ -37,20 +38,17 @@ def parse(data: str) -> Tuple[List[int], Dict[str, List[str]]]:
     directions = {value[0].strip(): [des.strip() for des in value[1].strip(' ()').split(',')] for value in [d.split("=") for d in directions.strip().splitlines()]}
     return (instructions, directions)
 
+
 def part1():
     content = read_file("input.txt")
     (instructions, directions) = parse(content)
-    step = 1
-    index = 0;
+    step = 0
     current_key = 'AAA'
-    while True:
-        index = index % len(instructions)
-        ins = instructions[index]
-        current_key = directions[current_key][ins]
-        if current_key == 'ZZZ':
-            break
-        index += 1
+    instructions = cycle(instructions)
+    while current_key != 'ZZZ':
+        current_key = directions[current_key][next(instructions)]
         step += 1
+    print(step)
 
 def part2():
     content = read_file("input.txt")
@@ -58,20 +56,15 @@ def part2():
     current_keys = [key for key in directions.keys() if key.endswith('A')]
     steps = []
     for current_key in current_keys:
-        index = 0
-        step = 1
-        while True:
-            index = index % len(instructions)
-            ins = instructions[index]
-            current_key = directions[current_key][ins]
-            if current_key.endswith('Z'):
-                steps.append(step)
-                break
-            index += 1
+        step = 0
+        instructions = cycle(instructions)
+        while not current_key.endswith('Z'):
+            current_key = directions[current_key][next(instructions)]
             step += 1
+        steps.append(step)
     result = least_common_mulitple(steps)
     print(result)
         
     
-# part1()
+part1()
 part2()
